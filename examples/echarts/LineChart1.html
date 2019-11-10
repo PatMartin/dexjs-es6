@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+    </style>
+    <title>dex.js : ECharts Line Chart</title>
+    <link rel="stylesheet" href="../../src/css/dex.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="../../dist/dex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+
+</head>
+<body>
+
+<script>
+
+  $(document).ready(function () {
+    // Creates a dummy dataset
+    var csv = dex.data.salesData();
+
+    // Just create the chart, don't render it.
+    var chart = new dex.charts.echarts.LineChart({
+        'csv': csv,
+        'dimension.color.type': 'category',
+        'dimension.x.type': 'category',
+        'dimension.y.type': 'value'
+      }
+    )
+
+    // Enable click events on the chart
+    chart.enableClickEvent();
+
+    // Attach the chart to the body of the DOM
+    // chart.set("parent", "body")
+    chart.set("parent", $("body"));
+
+    // Update the chart every time the user clicks the mouse button.
+    chart.click = function () {
+      chart.set("csv", dex.data.salesData()).update();
+    }
+  });
+</script>
+</body>
+</html>

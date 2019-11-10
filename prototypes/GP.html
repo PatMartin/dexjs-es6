@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #Chart, #Config {
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            min-width: 100%;
+        }
+
+    </style>
+    <title>dex.js : ECharts Line Chart</title>
+    <!-- Dependencies:
+    Core: jquery, lodash
+    GuiPane: spectrum, bootstrap, bootstrap-multiselect, bootstrap-toggle, nouisider, jquery-layout
+    Example Specific: echarts, jquery-layout, faker
+    -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-layout/1.4.3/layout-default.min.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/css/ion.rangeSlider.min.css"/>
+    <link rel="stylesheet" href="../src/css/dex.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-layout/1.4.3/jquery.layout.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min.js"></script>
+    <script src="../dist/dex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+
+</head>
+<body>
+
+<div class="ui-layout-center">
+    <div id="Chart"></div>
+</div>
+<div class="ui-layout-west">
+    <div id="Config">
+        <div id="dex-ui-guipane" class="dex-cmp dex-ui-guipane">
+            <div class="dex-ui-guipane-title text-center btn btn-primary btn-block" data-toggle="collapse"
+                 data-target="#dex-ui-guipane-body" aria-expanded="true">Gui Configuration
+            </div>
+            <div id="dex-ui-guipane-body" class="dex-ui-guipane-body card card-body collapse in" aria-expanded="true"
+                 style="">
+                <div class="btn btn-primary btn-block text-center"
+                     data-toggle="collapse"
+                     data-target="#_Chart__dex-chart-echarts-linechart_dex-chart-echarts-linechart_EChart_Line_Chart_Settings-1"
+                    >EChart Line Chart Settings
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+  $(document).ready(function () {
+    var csv = dex.data.salesData();
+
+    $('body').layout({
+      applyDemoStyles: false,
+      west: {
+        size: 360
+      },
+      onresize: function () {
+        chart.resize()
+      }
+    });
+
+    var chart = new dex.charts.echarts.LineChart({
+        parent: '#Chart',
+        csv: csv,
+        'dimension.color.type': 'category',
+        'dimension.x.type': 'category',
+        'dimension.y.type': 'value'
+      }
+    )
+  });
+</script>
+</body>
+</html>

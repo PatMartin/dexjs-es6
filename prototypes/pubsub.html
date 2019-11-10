@@ -1,0 +1,14 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="../dist/dex.js"></script>
+
+<script>
+    console.dir(dex);
+
+    var handle = dex.bus.subscribe("channel-1", "event-1", function (event) {
+      dex.log("received channel-1/event-1 event: ", event);
+    })
+
+    dex.bus.publish("channel-1", "event-1", { type: 'test-event-1' })
+    dex.bus.unsubscribe("channel-1", "event-1", handle)
+    dex.bus.publish("channel-1", "event-1", { type: 'test-event-2' })
+</script>

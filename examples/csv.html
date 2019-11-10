@@ -1,0 +1,13 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="../dist/dex.js"></script>
+
+<script>
+    console.dir(dex);
+  dex.log("Empty CSV", new dex.Csv());
+  dex.log("A/B Header CSV", new dex.Csv(["A", "B"]));
+  dex.log("A/B CSV", new dex.Csv(["A", "B"], [["a", "b"]]));
+  dex.log("A/B JSON CSV", new dex.Csv({header: ["A", "B"], data: [[1, 2]]}));
+
+  dex.log(dex.array.copy([1, 2, 3]));
+
+</script>

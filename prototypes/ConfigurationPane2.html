@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #LayoutPane {
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            min-width: 100%;
+        }
+    </style>
+    <title>dex.js : DataFilterPane</title>
+
+    <!--link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.theme.min.css"-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-layout/1.4.3/layout-default.min.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/css/ion.rangeSlider.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.6/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" href="../src/css/dex.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-layout/1.4.3/jquery.layout.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.6/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
+    <script src="../dist/dex.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.3.0/echarts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+
+</head>
+<body>
+
+<div id="LayoutPane"></div>
+<script>
+  // layout: layout(west=layout(center=col-select, south=data-pane),center=linechart)
+  function createData() {
+    let csv = new dex.Csv(['Name', 'Month', 'Sales', 'Extraneous', 'Item'], []);
+
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    var items = ["Car"];
+
+    for (var nameIndex = 0; nameIndex < 30; nameIndex++) {
+      var name = faker.name.firstName();
+      months.forEach(function (month) {
+        items.forEach(function (item) {
+          csv.data.push([name, month, faker.random.number(),
+            faker.random.number(), item]);
+        });
+      });
+    }
+
+    return csv;
+  }
+
+  var csv = createData();
+  var layoutPane = new dex.ui.LayoutPane({
+    parent: "#LayoutPane",
+    id: "main",
+    layout: {west: {size: '24%'}},
+    resizable: true
+  });
+  layoutPane.render();
+
+  var lineChart = new dex.charts.echarts.LineChart({
+    parent: "#main>#center",
+    csv: csv
+  })
+
+  var configLayoutPane = new dex.ui.LayoutPane({
+    parent: "#main>#west",
+    id: "config",
+    layout: {north: { size: '33%'}, south: { size: '33%' }}
+  });
+  configLayoutPane.render()
+
+  var columnSelector = new dex.ui.ColumnSelector({
+    parent: "#config>#north",
+    id: "column-selector",
+    csv: csv
+  });
+  columnSelector.render()
+
+  var dataFilterPane = new dex.ui.DataFilterPane({
+    parent: "#config>#center",
+    id: "data-filter",
+    csv: csv,
+    targets: [ lineChart ]
+  });
+
+  var guiPane = new dex.ui.GuiPane({
+    parent: "#config>#south",
+    id: "gui-pane",
+    csv: csv,
+    components: [ lineChart ]
+  });
+
+  lineChart.render()
+  dataFilterPane.render()
+  guiPane.render();
+
+</script>
+</body>
+</html>

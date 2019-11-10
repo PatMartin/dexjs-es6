@@ -1,0 +1,39 @@
+{
+  "name": "dex",
+  "version": "0.1.0",
+  "description": "dex.js : a framework for data exploration",
+  "license": "Apache-2.0",
+  "keywords": [
+    "chart",
+    "charting",
+    "data",
+    "visualization"
+  ],
+  "homepage": "https://dexjs.net",
+  "email": "patrick145@msn.com",
+  "url": "https://dexjs.net",
+  "files": [
+    "src/dex.js"
+  ],
+  "main": "diest/dex.js",
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "jqueryui": "latest",
+    "rollup": "^1.26.3",
+    "shx": "^0.3.2"
+  },
+  "devDependencies": {
+    "esdoc": "latest",
+    "esdoc-lint-plugin": "latest",
+    "esdoc-standard-plugin": "latest",
+    "jasmine": "latest",
+    "terser-webpack-plugin": "latest",
+    "watch": "latest"
+  },
+  "scripts": {
+    "docs": "esdoc -c esdoc.json",
+    "src": "shx echo *** BEGIN: SRC *** && rollup -c rollup.config.js && echo *** END: SRC ***",
+    "watch-doc": "watch \"npm run docs\" src/js",
+    "watch-src": "watch \"npm run src\" src/js"
+  }
+}

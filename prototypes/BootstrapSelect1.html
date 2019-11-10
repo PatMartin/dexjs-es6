@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            min-width: 100%;
+        }
+
+        #ColumnSelector, #source, #dest {
+            height: 200px;
+            width: 100%;
+        }
+    </style>
+    <title>dex.js : Bootstrap Select</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.6/css/bootstrap-select.min.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.6/js/bootstrap-select.min.js"></script>
+
+</head>
+<body>
+
+<!-- Build your select: -->
+<select class="selectpicker"
+        title="Property Type: N/A"
+        data-style="btn-info"
+        data-live-search="true"
+        data-count-selected-text="Property Type ({0}/{1})"
+        data-selected-text-format="count>0"
+        data-actions-box="true" multiple>
+    <option value="cheese" selected>Cheese</option>
+    <option value="tomatoes" selected>Tomatoes</option>
+    <option value="mozarella" selected>Mozzarella</option>
+    <option value="mushrooms" selected>Mushrooms</option>
+    <option value="pepperoni" selected>Pepperoni</option>
+    <option value="onions" selected>Onions</option>
+</select>
+
+<script>
+  $(document).ready(function () {
+    var header = "Toppings"
+
+    var $select = $('select')
+    $select.selectpicker({
+      virtualScroll: true
+    })
+    $select.selectpicker("refresh");
+  });
+
+
+</script>
+</body>
+</html>

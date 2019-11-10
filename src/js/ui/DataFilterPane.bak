@@ -1,0 +1,218 @@
+import {Component} from '../Component.js';
+
+export class DataFilterPane extends Component {
+
+  constructor(opts) {
+    var base = {
+      // The parent container of this pane.
+      "parent": null,
+      "id": "DataFilterPaneId",
+      "class": "DataFilterPaneClass",
+      "width": "30%",
+      "height": "30%",
+      "csv": undefined,
+      "targets": []
+    };
+
+    super(new dex.Configuration(base).overlay(opts));
+    this.selectedCategories = {};
+    this.dateRanges = {};
+    this.selectedRanges = {};
+    this.CHANGED = false;
+  }
+
+  render() {
+    super.render();
+    let config = this.config;
+    let $parent = $(config.get("parent"));
+    let targets = config.get("targets");
+    let csv = config.get("csv");
+    let self = this;
+
+    // Add each component as a subscriber
+    targets.forEach(function (component) {
+      component.subscribe(self.getChannel(), "select", function (event) {
+        dex.log("DataFilterPane(select): ", event, component);
+        component.set("csv", event.csv)
+        component.update();
+      });
+    })
+
+    let $dfp = $(`<div id="${config.get("id")}" class="${config.get("class")}"></div>`)
+    $parent.append($dfp)
+
+    var dataTypes = csv.guessTypes();
+    var categoryFilters = this.createCategoryFilters($dfp, dataTypes);
+    var numericFilters = this.createNumericFilters($dfp, dataTypes);
+
+    //$parent.find('.collapse').show();
+    return this;
+  }
+
+  createCategoryFilters($parent, dataTypes) {
+    var categoryFilters = []
+    let csv = this.get("csv")
+
+    if (dataTypes.includes("string")) {
+      dex.log("STRING INCLUDED")
+      let $cat = $("<h3 data-toggle='collapse' data-target='#dex-cat-filters'>Categorical Filters</h3>")
+      let $filters = $("<div id='dex-cat-filters' class='collapse'></div>")
+
+      $parent.append($cat)
+      $cat.append($filters)
+
+      let stringIndexes = dex.array.findIndexes(dataTypes,
+        function (elt) {
+          return elt === "string"
+        })
+
+      dex.log("STRING LOCATIONS:", stringIndexes)
+
+      stringIndexes.forEach(function (index) {
+        $filters.append(`<div class="card card-body" id="dex-dfp-cat-filter-${index}"></div>`)
+        categoryFilters.push(new dex.ui.ListSelector({
+          parent: `#dex-dfp-cat-filter-${index}`,
+          items: csv.unique(index),
+          selectAll: true
+        }))
+      })
+    }
+
+    categoryFilters.forEach(function (filter) {
+        filter.render();
+      }
+    )
+
+    return categoryFilters
+  }
+
+  createNumericFilters($parent, dataTypes) {
+    var numericFilters = []
+
+    if (dataTypes.includes("number")) {
+      dex.log("STRING INCLUDED")
+      let $num = $("<h3 data-toggle='collapse' data-target='#dex-num-filters'>Numeric Filters</h3>")
+      let $filters = $("<div id='dex-num-filters' class='collapse'></div>")
+
+      $parent.append($num)
+      $num.append($filters)
+
+      let numberIndexes = dex.array.findIndexes(dataTypes,
+        function (elt) {
+          return elt === "number"
+        })
+
+      dex.log("NUMBER LOCATIONS:", numberIndexes)
+
+      numberIndexes.forEach(function (index) {
+        $filters.append(`<div class="card card-body dex-ui-slider-parent" id="dex-dfp-num-filter-${index}"></div>`)
+        numericFilters.push(new dex.ui.Slider({
+          parent: `#dex-dfp-num-filter-${index}`,
+          data: csv.column(index),
+          range: true
+        }))
+      })
+    }
+
+    numericFilters.forEach(function (filter) {
+        filter.render();
+      }
+    )
+
+    return numericFilters
+  }
+
+  getSelectValues(select) {
+    var result = [];
+    var options = select && select.options;
+    var opt;
+
+    for (var i = 0, iLen = options.length; i < iLen; i++) {
+      opt = options[i];
+
+      if (opt.selected) {
+        result.push(opt.value || opt.text);
+      }
+    }
+    //dex.console.log("GET SELECT VALUES: ", select, "RESULT", result);
+    return result;
+  }
+
+  updateCsv() {
+    // Ignore spurious events until we have completed initialization.
+    let config = this.config;
+    let $parent = $(config.get("parent"));
+    let csv = config.get("csv");
+    let self = this;
+
+    //dex.console.log("UPDATE CSV", "INITIALIZING", INITIALIZING, "CSV", csv);
+    if (this.INITIALIZING) {
+      return;
+    }
+
+    var i;
+
+    let selectedColumns = csv.header;
+
+    dex.log("SELECTED-COLUMNS", selectedColumns);
+
+    // Update the selection map
+    $(config.get("parent") + ' .' + config.get("class") + "_category").each(function (i, obj) {
+      var colMap = {};
+
+      self.getSelectValues(obj).forEach(function (val) {
+        colMap[val] = true;
+      });
+      self.selectedCategories[obj.id] = colMap;
+    });
+
+    // Update the csv based upon the selection map
+    var selectedCsv = csv.selectRows(function (row) {
+        return row.every(function (col, ci) {
+          var header = csv.header[ci];
+
+          // False if we're filtering this category but haven't selected this
+          // category value.
+          if (self.selectedCategories[header]) {
+            //dex.console.logString("HDR: ", header, ", VAL: ", col, ", SHOW: ",
+            //  self.selectedCategories[header][col]);
+            if (!self.selectedCategories[header][col]) {
+              return false;
+            }
+          }
+
+          // Screening by date range
+          if (self.dateRanges[header]) {
+            if (row[ci] < self.dateRanges[header].min ||
+              row[ci] > self.dateRanges[header].max) {
+              return false;
+            }
+          }
+
+          // Screening by numeric range.
+          if (self.selectedRanges[header]) {
+            if (col < self.selectedRanges[csv.header[ci]].min ||
+              col > self.selectedRanges[csv.header[ci]].max) {
+              return false;
+            }
+          }
+
+          // It passed our screens, must be data we care about.
+          return true;
+        });
+      }
+    );
+
+    dex.log("Selected Csv", selectedCsv)
+
+    // Publish the selected subset of the csv.
+    dex.log("Publishing select event");
+    this.publish("select", {
+      "csv": selectedCsv.include(selectedColumns)
+    });
+  }
+
+  update() {
+    return this;
+  };
+}
