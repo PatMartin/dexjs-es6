@@ -17,7 +17,7 @@
   ],
   "main": "diest/dex.js",
   "dependencies": {
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jqueryui": "latest",
     "rollup": "^1.26.3",
     "shx": "^0.3.2"
